@@ -7,7 +7,15 @@ var access_token;
 var game_token;
 
 frisby.create('Test dengan user dan password random')
-.get(baseUrl+'/user/register/'+userRandom+'/'+passRandom+'/yusuf/afandi/afandi.yusuf.04@gmail.com/08563604240/bandung')
+.post(baseUrl+'/user/register',{
+	username:userRandom,
+	password:passRandom,
+	nama_depan:'yusuf',
+	nama_belakang:'afandi',
+	email:'afandi.yusuf.04@gmail.com',
+	alamat:'bandung',
+	no_hp:'01929823012380123'
+})
 .expectStatus(200)
 .expectJSON({
 	status_code:200
@@ -21,7 +29,10 @@ frisby.create('Test dengan user dan password random')
 .afterJSON(function(json){
 	//----------------------- LOGIN SETELAH REGISTER ---------------------//
 	frisby.create('Test login dengan user random yang telah dibuat')
-	.get(baseUrl+'/user/login/'+userRandom+'/'+passRandom)
+	.post(baseUrl+'/user/login',{
+		username:userRandom,
+		password:passRandom
+	})
 	.expectStatus(200)
 	.expectJSON({
 		status_code:200
@@ -36,8 +47,11 @@ frisby.create('Test dengan user dan password random')
 	.afterJSON(function(json2){
 		//----------------------------------- TEST WITH ACCESS TOKEN --------------------//
 			access_token = json2.data.access_token;
-			frisby.create('Test login dengan user random yang telah dibuat')
-			.get(baseUrl+'/user/getData/'+access_token)
+			frisby.create('get data dengan user random yang telah dibuat')
+			.post(baseUrl+'/user/getData',
+			{
+				access_token:access_token
+			})
 			.expectStatus(200)
 			.expectJSON({
 				status_code:200
@@ -49,7 +63,9 @@ frisby.create('Test dengan user dan password random')
 			.toss();
 
 			frisby.create(' Test untuk membuat game session')
-			.get(baseUrl+'/game/creatSession/'+access_token)
+			.post(baseUrl+'/game/creatSession',{
+				access_token:access_token
+			})
 			.expectStatus(200)
 			.expectJSON({
 				status_code:200
@@ -70,8 +86,13 @@ frisby.create('Test dengan user dan password random')
 				{
 					game_token = json.data.game_token;
 					var score = Math.round(Math.random()*500);
-					frisby.create('Test untuk cek validasi game token')
-					.get(baseUrl+'/game/postScorePerLevel/'+access_token+'/'+game_token+'/'+score+'/level'+(i+1))
+					frisby.create('Test untuk post score per level')
+					.post(baseUrl+'/game/postScorePerLevel',{
+						access_token:access_token,
+						game_token:game_token,
+						score:score,
+						level:'level'+(i+1)
+					})
 					.expectStatus(200)
 					.expectJSON({
 						status_code:200
@@ -86,8 +107,13 @@ frisby.create('Test dengan user dan password random')
 				}
 				
 				
-				frisby.create('Test untuk cek validasi game token')
-				.get(baseUrl+'/game/postScorePerLevel/'+access_token+'/'+game_token+'/'+Math.round(Math.random()*500)+'/level1')
+				frisby.create('Test untuk post score per level dengan score random')
+				.post(baseUrl+'/game/postScorePerLevel',{
+						access_token:access_token,
+						game_token:game_token,
+						score:Math.round(Math.random()*500),
+						level:'level1'
+					})
 				.expectStatus(200)
 				.expectJSON({
 					status_code:409
@@ -99,8 +125,12 @@ frisby.create('Test dengan user dan password random')
 				.toss();
 
 				game_token = json.data.game_token;
-				frisby.create('Test untuk cek validasi game token')
-				.get(baseUrl+'/game/postTotalScore/'+access_token+'/'+game_token+'/'+totalScore)
+				frisby.create('Test posting total score')
+				.post(baseUrl+'/game/postTotalScore',{
+					access_token:access_token,
+					game_token:game_token,
+					score:totalScore
+				})
 				.expectStatus(200)
 				.expectJSON({
 					status_code:200
@@ -111,25 +141,21 @@ frisby.create('Test dengan user dan password random')
 				.inspectJSON()
 				.toss();
 
+				game_token = json.data.game_token;
 				frisby.create('Test untuk cek validasi game token')
-				.get(baseUrl+'/game/postScorePerLevel/'+access_token+'/'+game_token+'/'+Math.round(Math.random()*500)+'/level1')
+				.post(baseUrl+'/game/getScoreBySession',
+				{
+					access_token:access_token,
+					game_token:game_token
+				})
 				.expectStatus(200)
 				.expectJSON({
-					status_code:409
+					status_code:200
 				})
 				.expectJSONTypes({
 					status_message:String
 				})
-				.inspectJSON()
 				.toss();
-
-				game_token = json.data.game_token;
-				frisby.create('Test untuk cek validasi game token')
-				.get(baseUrl+'/game/getALlScore/'+access_token+'/'+game_token)
-				.expectStatus(200)
-				.inspectJSON()
-				.toss();
-
 
 				//--------------------------------- END TEST GAME TOKEN -----------------------//
 			})
@@ -139,5 +165,15 @@ frisby.create('Test dengan user dan password random')
 	.toss();
 
 	//------------------------ LOGIN SETELAH REGISTER END --------------------//
+})
+.toss();
+
+//-----------------------------TEST PUBLIC DATA -------------------//
+frisby.create('Test untuk mengambil top 10')
+.get(baseUrl+'/game/getScore/10')
+.inspectJSON()
+.expectStatus(200)
+.expectJSON({
+	status_code:200
 })
 .toss();

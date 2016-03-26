@@ -11,6 +11,7 @@ require 'src/function.php';
 $app = new \Slim\App;
 
 require 'src/user.php';
+require 'src/game.php';
 
 $app->run();
 
