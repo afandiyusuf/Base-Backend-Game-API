@@ -18,12 +18,14 @@ $app->post('/user/register', function ($request, $response, $args) use($database
 	$email 			= $request->getParam('email');
 
 	$datas = new JsonData();
+	$status_server = 404;
 	
 	if(!isset($username)||!isset($password)||!isset($nama_depan)||!isset($nama_belakang)||!isset($no_hp)||!isset($alamat)||!isset($email))
 	{
 		$datas->status_message = "data tidak lengkap";
 		$datas->status_code = 402;
 		$datas->data = [];
+		$status_server = 402;
 	}else{
 
 		$access_token = "";
@@ -36,6 +38,7 @@ $app->post('/user/register', function ($request, $response, $args) use($database
 			$datas->status_message = "username sudah terpakai";
 			$datas->status_code = 401;
 			$datas->data = [];
+			$status_server = 401;
 
 		}else{
 			$user_id = $database->insert('user_data', [
@@ -65,10 +68,13 @@ $app->post('/user/register', function ($request, $response, $args) use($database
 			$datas->data = [
 			"access_token" => $access_token
 			];
+			$status_server = 200;
 		}
 	}
+	//$response->headers->set('Content-Type', 'application/json');
     //$app->response->headers->set('Content-Type', 'application/json');
-	echo json_encode($datas);
+	$response->withJson($datas,$status_server);
+	//echo json_encode($datas);
 });
 
 $app->post('/user/login', function ($request, $response, $args) use($database) {
@@ -123,7 +129,8 @@ $app->post('/user/login', function ($request, $response, $args) use($database) {
 			$jsonData->data = [];
 		}
 	}
-	echo json_encode($jsonData);
+	//$response->headers->set('Content-Type', 'application/json');
+	$response->withJson($jsonData);
 });
 
 $app->post('/user/getData', function ($request, $response, $args) use($database) {
@@ -166,7 +173,7 @@ $app->post('/user/getData', function ($request, $response, $args) use($database)
 		$jsonData->status_message = "get data success";
 	}
 
-	return json_encode($jsonData);
+	$response->withJson($jsonData);
 });
 
 

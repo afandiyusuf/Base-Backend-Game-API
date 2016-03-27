@@ -1,4 +1,4 @@
-var baseUrl = "http://localhost:90/BaseGameApi/index.php";
+var baseUrl = "http://localhost:90/Base-Backend-Game-API/index.php";
 var frisby = require('frisby');
 
 var userRandom = Math.random();
@@ -105,8 +105,8 @@ frisby.create('Test dengan user dan password random')
 
 					totalScore+= score;
 				}
-				
-				
+
+
 				frisby.create('Test untuk post score per level dengan score random')
 				.post(baseUrl+'/game/postScorePerLevel',{
 						access_token:access_token,
