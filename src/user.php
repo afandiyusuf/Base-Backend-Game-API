@@ -19,7 +19,7 @@ $app->post('/user/register', function ($request, $response, $args) use($database
 
 	$datas = new JsonData();
 	$status_server = 404;
-	
+
 	if(!isset($username)||!isset($password)||!isset($nama_depan)||!isset($nama_belakang)||!isset($no_hp)||!isset($alamat)||!isset($email))
 	{
 		$datas->status_message = "data tidak lengkap";
@@ -100,7 +100,7 @@ $app->post('/user/login', function ($request, $response, $args) use($database) {
 		$jsonData->data = [];
 	}else{
         //get user id
-		foreach ($datas as $data) 
+		foreach ($datas as $data)
 		{
 			$user_id = $data["id"];
 		}
@@ -148,7 +148,7 @@ $app->post('/user/getData', function ($request, $response, $args) use($database)
 	{
 		$jsonData->status_code = 406;
 		$jsonData->status_message = "access token invalid";
-		$jsonData->data = []; 
+		$jsonData->data = [];
 	}else{
 		foreach ($result as $data) {
 			$user_id = $data['user_id'];
@@ -175,6 +175,3 @@ $app->post('/user/getData', function ($request, $response, $args) use($database)
 
 	$response->withJson($jsonData);
 });
-
-
-
