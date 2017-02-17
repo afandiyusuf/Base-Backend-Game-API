@@ -19,10 +19,40 @@ Class DatabaseModel{
 		]);
 	}
 
-	public function register($userData){
+	public function register($userData)
+	{
 		$this->db->insert($this->user_table,$userData);
-		echo $this->db->id();
 		return $this->db->id();
+	}
+
+	public function validate_user_pass($username,$password)
+	{
+		$id = $this->db->get($this->user_table,'id',[
+			"AND"=>[
+				"user_name" => $username,
+				"password" => $password
+			]
+		]);
+
+		return $id;
+	}
+
+	public function validate_access_token($access_token,$id)
+	{
+		$total =  $this->db->count($this->access_token_table,[
+			"AND"=>[
+				"user_id"=>$id,
+				"access_token" => $access_token,
+				"is_valid" => 1
+			]
+		]);
+
+		if($total > 0)
+		{
+			return false;
+		}else{
+			return true;
+		}
 	}
 
 	public function set_access_token($user_id, $access_token)
@@ -49,6 +79,8 @@ Class DatabaseModel{
 			]);
 		}
 	}
+
+
 }
 
 

@@ -14,15 +14,27 @@ class UserMiddleware
     public function __invoke($request, $response, $next)
     {
         $access_token       = $request->getParam('access_token');
+        $username           = $request->getParam("user_name");
+        $password           = $request->getParam("password");
 
-        if(!isset($access_token))
+
+        //if client send 2 of this variable, that mean client is request login method
+        if(isset($username) && isset($password))
         {
-            $request = $request->withAttribute('login_status','false');
-        }else{
             $database = new DatabaseModel();
+            $validated = $database->validate_user_pass($username,$password);
+            if(!$validated)
+            {
+                $request = $request->withAttribute('is_login',false);
+            }else{
+                $request = $request->withAttribute('is_login',true);
+                $request = $request->withAttribute('user_id',$validated);
+            }
+
         }
 
         $response = $next($request, $response);
+
         return $response;
     }
 

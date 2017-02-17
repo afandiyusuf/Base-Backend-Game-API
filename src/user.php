@@ -1,4 +1,12 @@
 <?php
+
+// Routes
+//200 success
+//401 username sudah terpakai
+//402 data tidak lengkap
+//403 password atau username salah
+//400 system error
+
 class UserClass
 {
    protected $container;
@@ -69,12 +77,41 @@ class UserClass
 			}
 		}
 
+
+
 		return $response->withJson($datas,$status_server);
 	}
 
 	public function login($request, $response, $args)
 	{
-		return $response;
+		$is_login = $request->getAttribute("is_login");
+		$datas = new JsonData();
+		$status_server = 400;
+
+		if($is_login)
+		{
+			$database = new DatabaseModel();
+
+			$user_id = $request->getAttribute("user_id");
+
+			$access_token = generateRandomString(100);
+			$database->set_access_token($user_id,$access_token);
+
+			$datas->status_message = "login success";
+			$datas->status_code = 200;
+			$datas->data = [
+				"id" => $user_id,
+				"access_token"=>$access_token
+			];
+			$status_server = 200;
+
+		}else{
+			$datas->status_message = "username atau password salah";
+			$datas->status_code = 400;
+			$datas->data = [];
+		}
+
+		return $response->withJson($datas,$status_server);
 	}
 }
 

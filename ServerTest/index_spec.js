@@ -19,6 +19,7 @@ registerRandomUser();
 // $email 			= $request->getParam('email');
 
 function registerRandomUser(){
+	console.log("REGISTER RANDOM USER : ");
 	frisby.create('Register random user')
 	.post(baseUrl+'/user/register',{
 		username:userRandom,
@@ -27,16 +28,32 @@ function registerRandomUser(){
 		nama_belakang:"test",
 		no_hp:"123123123123",
 		alamat:"alamat",
-		email:randomEmail})
+		email:randomEmail}
+	)
 	.expectStatus(200)
-	.inspectStatus()
-	.inspectBody()
-	// .afterJSON(function(json){
-	// 	access_token = json.data.access_token;
-	// 	//console.log(json)
-	// })
+	.afterJSON(function(json){
+	 	access_token = json.data.access_token;
+	 	loginUser();
+	})
 	.toss();
 }
 
+
+function loginUser(){
+	console.log("LOGIN USER : ");
+	frisby.create('LOGIN SET USER')
+	.post(baseUrl+'/user/login',{
+			user_name:userRandom,
+			password:passRandom
+		}
+	)
+	.expectStatus(200)
+	//.inspectBody()
+	.inspectJSON()
+	.afterJSON(function(json){
+	 	
+	})
+	.toss();
+}
 
 

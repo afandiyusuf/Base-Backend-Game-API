@@ -20,6 +20,7 @@ $app = new \Slim\App();
 # Setting group make api callable at uri /user/
 $app->group('/user',function() {
 	$this->post('/register', \UserClass::class . ':register');
+	$this->post('/login', \UserClass::class . ':login');
 })->add(
 	new UserMiddleware()
 );
